@@ -1,16 +1,9 @@
-@import "tailwindcss";
-
-@theme inline {
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
-  --color-navy: #001F3F;
-  --color-gold: #FFD700;
-  --color-soft-grey: #F5F5F5;
-  --color-verified: #22c55e;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
 .scrollbar-none::-webkit-scrollbar {
