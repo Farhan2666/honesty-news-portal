@@ -23,9 +23,12 @@ async function loginViaApi(email: string, password: string) {
     const valid = await comparePassword(password, user.password as string);
     if (!valid) throw new Error("WRONG_PASSWORD");
   } catch {
-    // plain text fallback (for users created via Management API)
     if (user.password !== password) throw new Error("WRONG_PASSWORD");
   }
+  // Normalize role to uppercase (Prisma UserRole enum style)
+  if (user.role === "admin") user.role = "ADMIN";
+  else if (user.role === "editor") user.role = "EDITOR";
+  else user.role = "MEMBER";
   return user;
 }
 
