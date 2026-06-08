@@ -34,12 +34,19 @@ export async function POST(request: Request) {
 
     let user: Record<string, unknown>;
     try {
-      user = await registerViaPrisma(email, password, name) as unknown as Record<string, unknown>;
+      try {
+        user = await registerViaPrisma(email, password, name) as unknown as Record<string, unknown>;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "";
+        if (msg === "EMAIL_EXISTS") return apiError(4002, "Email sudah terdaftar");
+        console.log("Prisma unavailable for register, falling back to Management API");
+        user = await registerViaApi(email, password, name);
+      }
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "";
-      if (msg === "EMAIL_EXISTS") return apiError(4002, "Email sudah terdaftar");
-      console.log("Prisma unavailable for register, falling back to Management API");
-      user = await registerViaApi(email, password, name);
+      if (e instanceof Error && e.message === "EMAIL_EXISTS") {
+        return apiError(4002, "Email sudah terdaftar");
+      }
+      throw e;
     }
 
     const token = signToken({ userId: user.id as string, role: (user.role as string) ?? "user" });
