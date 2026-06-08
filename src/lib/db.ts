@@ -8,10 +8,6 @@ function getCredentials() {
   return { token: TOKEN, ref: PROJECT_REF };
 }
 
-function getCredentials() {
-  return { token: TOKEN, ref: PROJECT_REF };
-}
-
 export async function query<T = Record<string, unknown>>(sql: string): Promise<T[]> {
   const { token, ref } = getCredentials();
   const res = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
