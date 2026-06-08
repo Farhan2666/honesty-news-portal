@@ -3,8 +3,12 @@ const PROJECT_REF = process.env.SUPABASE_PROJECT_REF;
 
 function getCredentials() {
   if (!TOKEN || !PROJECT_REF) {
-    throw new Error("SUPABASE_MGMT_TOKEN and SUPABASE_PROJECT_REF must be set in .env");
+    throw new Error("SUPABASE_MGMT_TOKEN environment variable not set");
   }
+  return { token: TOKEN, ref: PROJECT_REF };
+}
+
+function getCredentials() {
   return { token: TOKEN, ref: PROJECT_REF };
 }
 
@@ -23,26 +27,4 @@ export async function query<T = Record<string, unknown>>(sql: string): Promise<T
   return res.json();
 }
 
-function escape(val: unknown): string {
-  if (typeof val === "string") return `'${val.replace(/'/g, "''")}'`;
-  if (typeof val === "number") return String(val);
-  return "NULL";
-}
 
-export function buildWhereClause(conditions: Record<string, unknown>): { clause: string; params: unknown[] } {
-  const params: unknown[] = [];
-  const clauses: string[] = [];
-
-  for (const [key, val] of Object.entries(conditions)) {
-    if (val === undefined || val === null) continue;
-    const col = `"${key.replace(/([A-Z])/g, "_$1").toLowerCase()}"`;
-    if (typeof val === "string") {
-      clauses.push(`${col} = '${val.replace(/'/g, "''")}'`);
-    } else if (typeof val === "number" || typeof val === "boolean") {
-      clauses.push(`${col} = ${val}`);
-    } else {
-      clauses.push(`${col} = '${String(val)}'`);
-    }
-  }
-  return { clause: clauses.length ? clauses.join(" AND ") : "1=1", params };
-}
