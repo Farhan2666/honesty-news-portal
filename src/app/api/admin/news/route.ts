@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   if (auth instanceof NextResponse) return auth;
   const { user } = auth;
 
-  if (user.role !== "ADMIN" && user.role !== "EDITOR") {
+  if (!["ADMIN", "EDITOR"].includes(user.role.toUpperCase())) {
     return apiError(403, "Forbidden", 403);
   }
 
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   if (auth instanceof NextResponse) return auth;
   const { user } = auth;
 
-  if (user.role !== "ADMIN" && user.role !== "EDITOR") {
+  if (!["ADMIN", "EDITOR"].includes(user.role.toUpperCase())) {
     return apiError(403, "Forbidden", 403);
   }
 

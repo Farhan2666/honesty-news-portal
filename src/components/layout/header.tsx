@@ -27,7 +27,7 @@ export function Header() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              {user.role === "ADMIN" || user.role === "EDITOR" ? (
+              {user && ["ADMIN", "EDITOR"].includes(user.role.toUpperCase()) ? (
                 <Link href="/admin" className="hidden sm:inline text-sm px-3 py-1.5 rounded bg-navy text-white hover:bg-navy/90 transition-colors">
                   Admin
                 </Link>

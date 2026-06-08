@@ -12,13 +12,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && (!user || (user.role !== "ADMIN" && user.role !== "EDITOR" && user.role !== "FACT_CHECKER"))) {
+    if (!loading && (!user || !["ADMIN", "EDITOR", "FACT_CHECKER"].includes(user.role.toUpperCase()))) {
       router.push("/login");
     }
   }, [user, loading, router]);
 
   if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-2 border-navy border-t-transparent rounded-full" /></div>;
-  if (!user || (user.role !== "ADMIN" && user.role !== "EDITOR" && user.role !== "FACT_CHECKER")) return null;
+  if (!user || !["ADMIN", "EDITOR", "FACT_CHECKER"].includes(user.role.toUpperCase())) return null;
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: HiChartBar },
