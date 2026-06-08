@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  GUEST
+  MEMBER
+  EDITOR
+  ADMIN
+  FACT_CHECKER
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  FLAGGED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         UserRole @default(MEMBER)
+  preferences  Json?    @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  articles   Article[]
+  bookmarks  Bookmark[]
+  auditLogs  AuditLog[]
+  verifications Verification[]
+
+  @@map("users")
+}
+
+model Article {
+  id                String             @id @default(cuid())
+  slug              String             @unique
+  title             String
+  content           String
+  thumbnailUrl      String?            @map("thumbnail_url")
+  category          String
+  verificationScore Float?             @map("verification_score")
+  verificationStatus VerificationStatus @default(PENDING) @map("verification_status")
+  readingTime       Int?               @map("reading_time")
+  publishedAt       DateTime?          @map("published_at")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  authorId     String       @map("author_id")
+  author       User         @relation(fields: [authorId], references: [id])
+  verification Verification?
+  bookmarks    Bookmark[]
+
+  @@index([verificationStatus])
+  @@index([category])
+  @@index([publishedAt])
+  @@map("articles")
+}
+
+model Verification {
+  id            String   @id @default(cuid())
+  articleId     String   @unique @map("article_id")
+  article       Article  @relation(fields: [articleId], references: [id])
+  apiResponse   Json?    @map("api_response")
+  isManualCheck Boolean  @default(false) @map("is_manual_check")
+  reviewerId    String?  @map("reviewer_id")
+  reviewer      User?    @relation(fields: [reviewerId], references: [id])
+  score         Float?
+  notes         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("verifications")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  articleId String   @map("article_id")
+  user      User     @relation(fields: [userId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, articleId])
+  @@map("bookmarks")
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  @@map("categories")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  metadata  Json?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
