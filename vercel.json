@@ -1,0 +1,4 @@
+{
+  "installCommand": "npm install --install-strategy=nested",
+  "buildCommand": "next build"
+}
