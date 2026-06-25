@@ -85,6 +85,9 @@ export default function ArticlePage() {
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-xs text-gray-500 uppercase tracking-wider">{article.category}</span>
+              {article.source && article.source !== "manual" && (
+                <span className="bg-orange-500/10 text-orange-600 text-xs px-2 py-0.5 rounded border border-orange-200">NewsAPI</span>
+              )}
               {isVerified && (
                 <span className="bg-verified/10 text-verified text-xs px-2 py-0.5 rounded flex items-center gap-1 border border-verified/20">
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" /></svg>
