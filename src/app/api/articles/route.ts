@@ -78,7 +78,8 @@ async function fetchLiveNewsFallback(category: string | null, limit: number) {
     readingTime: 3,
     publishedAt: raw.publishedAt,
     author: { id: "api", name: raw.source.name },
-  }));
+    };
+  });
   return { articles, total: articles.length };
 }
 
