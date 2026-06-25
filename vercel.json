@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install --install-strategy=nested",
-  "buildCommand": "next build",
+  "buildCommand": "npx prisma db push --accept-data-loss && next build",
   "crons": [
     {
       "path": "/api/news/sync-cron",
