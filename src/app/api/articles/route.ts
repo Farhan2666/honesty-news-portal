@@ -1,14 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { query } from "@/lib/db";
-
-const SUPPORTS_SOURCE_COLUMN = false;
+import { fetchTopNews } from "@/lib/news-api";
 
 async function fetchArticlesViaPrisma(category: string | null, page: number, limit: number, skip: number) {
-  const baseFilter = category && category !== "all"
-    ? { category }
-    : {};
-
   const where = category && category !== "all"
     ? { category }
     : {};
@@ -58,6 +53,31 @@ async function fetchArticlesViaApi(category: string | null, limit: number, skip:
   return { articles, total };
 }
 
+async function fetchLiveNewsFallback(category: string | null, limit: number) {
+  const rawArticles = await fetchTopNews(category || undefined, Math.min(limit, 20));
+  const articles = rawArticles.map((raw, i) => ({
+    id: `live-${Date.now()}-${i}`,
+    slug: `live-${Date.now()}-${i}`,
+    title: raw.title,
+    content: raw.content || raw.description || "",
+    thumbnailUrl: raw.image,
+    category: category || "umum",
+    verificationScore: 0.5,
+    verificationStatus: "PENDING" as const,
+    readingTime: 3,
+    publishedAt: raw.publishedAt,
+    author: { id: "api", name: raw.source.name },
+  }));
+  return { articles, total: articles.length };
+}
+
+const CATEGORY_MAP_REVERSE: Record<string, string> = {
+  umum: "general", dunia: "world", nasional: "nation",
+  bisnis: "business", teknologi: "technology",
+  hiburan: "entertainment", olahraga: "sports",
+  sains: "science", kesehatan: "health",
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
@@ -69,9 +89,15 @@ export async function GET(request: Request) {
     let result;
     try {
       result = await fetchArticlesViaPrisma(category, page, limit, skip);
-    } catch {
-      console.log("Prisma unavailable, falling back to Management API");
-      result = await fetchArticlesViaApi(category, limit, skip);
+    } catch (e1) {
+      console.log("Prisma unavailable, trying Management API:", e1);
+      try {
+        result = await fetchArticlesViaApi(category, limit, skip);
+      } catch (e2) {
+        console.log("Management API unavailable, falling back to live news:", e2);
+        const liveCategory = category && CATEGORY_MAP_REVERSE[category];
+        result = await fetchLiveNewsFallback(liveCategory || null, limit);
+      }
     }
 
     return NextResponse.json({
