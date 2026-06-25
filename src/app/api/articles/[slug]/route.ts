@@ -59,7 +59,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     }
 
     if (!article) {
-      const liveMatch = slug.match(/^live-\d+-(\d+)$/);
+      const liveMatch = slug.match(/^live-[a-z0-9]+-(\d+)$/);
       if (liveMatch) {
         const index = parseInt(liveMatch[1]);
         const rawArticles = await fetchTopNews(undefined, 20);
