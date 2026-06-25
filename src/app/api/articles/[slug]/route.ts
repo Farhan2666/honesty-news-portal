@@ -11,10 +11,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     try {
       article = await prisma.article.findUnique({
         where: { slug },
-        include: {
-          author: { select: { id: true, name: true } },
-          verification: { select: { score: true, apiResponse: true, notes: true, isManualCheck: true } },
-        },
+          include: {
+        author: { select: { id: true, name: true } },
+        verification: { select: { score: true, apiResponse: true, notes: true, isManualCheck: true } },
+          },
+          // source fields automatically included via Prisma schema
       });
     } catch {
       console.log("Prisma unavailable, trying Management API for article detail");
@@ -35,6 +36,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
             verificationScore: r.verification_score,
             verificationStatus: r.verification_status,
             readingTime: r.reading_time, publishedAt: r.published_at,
+            source: r.source, sourceUrl: r.source_url,
             createdAt: r.created_at, updatedAt: r.updated_at,
             author: r.author_id ? { id: r.author_id, name: r.author_name_user || "" } : null,
           };
@@ -76,6 +78,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
             verificationStatus: "PENDING",
             readingTime: 3,
             publishedAt: raw.publishedAt,
+            source: "newsapi",
+            sourceUrl: raw.url,
             createdAt: raw.publishedAt,
             updatedAt: raw.publishedAt,
             author: { id: "api", name: raw.source.name },

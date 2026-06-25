@@ -80,6 +80,8 @@ async function fetchLiveNewsFallback(category: string | null, limit: number) {
     verificationStatus: "PENDING" as const,
     readingTime: 3,
     publishedAt: raw.publishedAt,
+    source: "newsapi",
+    sourceUrl: raw.url,
     author: { id: "api", name: raw.source.name },
     };
   });
