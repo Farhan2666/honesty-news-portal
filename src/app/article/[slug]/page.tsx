@@ -97,17 +97,8 @@ export default function ArticlePage() {
             </h1>
             <div className="flex items-center justify-between text-sm text-gray-500">
               <div className="flex items-center gap-4">
-                {article.source === "gnews" ? (
-                  <span>Sumber: <strong className="text-gray-700">{article.authorName || "GNews"}</strong></span>
-                ) : (
-                  <span>Oleh <strong className="text-gray-700">{article.author?.name || "HONESTY"}</strong></span>
-                )}
+                <span>Oleh <strong className="text-gray-700">{article.author?.name || "HONESTY"}</strong></span>
                 <span>{article.readingTime} menit baca</span>
-                {article.source === "gnews" && article.sourceUrl && (
-                  <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline">
-                    Sumber Asli ↗
-                  </a>
-                )}
               </div>
               <div className="flex items-center gap-2">
                 {user && (
@@ -146,27 +137,17 @@ export default function ArticlePage() {
             ))}
           </div>
 
-          {article.verificationStatus !== "PENDING" || article.source === "gnews" ? (
-            <div className={`mt-8 p-4 rounded-lg border ${isVerified || article.source === "gnews" ? "bg-verified/5 border-verified/20" : "bg-red-50 border-red-200"}`}>
+          {isVerified && (
+            <div className="mt-8 p-4 rounded-lg border bg-verified/5 border-verified/20">
               <div className="flex items-center gap-2 mb-1">
-                {isVerified || article.source === "gnews" ? (
-                  <svg className="w-5 h-5 text-verified" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" /></svg>
-                ) : (
-                  <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 255 01-1.414 8.586L8.586 10l-4.293 4.293a1 1 255 010 1.414z" clipRule="evenodd" /></svg>
-                )}
-                <span className={`font-semibold text-sm ${isVerified || article.source === "gnews" ? "text-verified" : "text-red-600"}`}>
-                  {article.source === "gnews" ? "Dari Sumber Berita Terpercaya" : isVerified ? "Konten Terverifikasi" : "Konten Perlu Diwaspadai"}
-                </span>
+                <svg className="w-5 h-5 text-verified" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" /></svg>
+                <span className="font-semibold text-sm text-verified">Konten Terverifikasi</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                {article.source === "gnews"
-                  ? "Artikel ini diambil dari sumber berita terpercaya melalui GNews API."
-                  : isVerified
-                    ? "Artikel ini telah melalui proses verifikasi dan dinyatakan aman dari hoaks."
-                    : `Skor kredibilitas: ${((article.verificationScore ?? 0) * 100).toFixed(0)}%`}
+                Artikel ini telah melalui proses verifikasi dan dinyatakan aman dari hoaks.
               </p>
             </div>
-          ) : null}
+          )}
         </article>
       </main>
       <Footer />

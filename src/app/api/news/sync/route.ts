@@ -25,11 +25,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
     const category = body.category as string | undefined;
-    const query = body.query as string | undefined;
+    const q = body.query as string | undefined;
     const max = Math.min(body.max ?? 10, 50);
 
-    const rawArticles = query
-      ? await searchNews(query, max)
+    const rawArticles = q
+      ? await searchNews(q, max)
       : await fetchTopNews(category, max);
 
     let created = 0;
@@ -48,18 +48,15 @@ export async function POST(request: Request) {
       }
 
       const categorySlug = CATEGORY_MAP[category ?? "general"] || "umum";
+      const sourceLine = `---\n*Sumber: ${raw.source.name} — [Baca artikel asli](${raw.url})*\n\n`;
 
       await prisma.article.create({
         data: {
           slug,
           title: raw.title.slice(0, 500),
-          content: raw.content || raw.description || "",
+          content: sourceLine + (raw.content || raw.description || ""),
           thumbnailUrl: raw.image,
           category: categorySlug,
-          source: "gnews",
-          sourceUrl: raw.url,
-          sourceId: raw.url,
-          authorName: raw.source.name || "GNews",
           verificationStatus: "PENDING",
           verificationScore: 0.1 + Math.random() * 0.3,
           readingTime: estimateReadingTime(raw.content || raw.description || ""),

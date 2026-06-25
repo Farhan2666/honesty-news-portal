@@ -35,17 +35,15 @@ export async function GET(request: Request) {
         const existing = await prisma.article.findUnique({ where: { slug } });
         if (existing) slug = `${slug}-${Date.now()}`;
 
+        const sourceLine = `---\n*Sumber: ${raw.source.name} — [Baca artikel asli](${raw.url})*\n\n`;
+
         await prisma.article.create({
           data: {
             slug,
             title: raw.title.slice(0, 500),
-            content: raw.content || raw.description || "",
+            content: sourceLine + (raw.content || raw.description || ""),
             thumbnailUrl: raw.image,
             category: CATEGORY_MAP[cat] || "umum",
-            source: "gnews",
-            sourceUrl: raw.url,
-            sourceId: raw.url,
-            authorName: raw.source.name || "GNews",
             verificationStatus: "PENDING",
             verificationScore: 0.1 + Math.random() * 0.3,
             readingTime: estimateReadingTime(raw.content || raw.description || ""),

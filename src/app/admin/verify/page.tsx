@@ -73,7 +73,7 @@ export default function VerifyPage() {
                 </div>
                 <h3 className="font-semibold text-sm text-navy truncate">{article.title}</h3>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {article.author?.name || article.authorName || "GNews"} • {new Date(article.createdAt).toLocaleDateString("id-ID")}
+                  {article.author?.name || "GNews"} • {new Date(article.createdAt).toLocaleDateString("id-ID")}
                 </p>
               </div>
               <div className="flex gap-2 shrink-0">

@@ -2,18 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { query } from "@/lib/db";
 
+const SUPPORTS_SOURCE_COLUMN = false;
+
 async function fetchArticlesViaPrisma(category: string | null, page: number, limit: number, skip: number) {
   const baseFilter = category && category !== "all"
     ? { category }
     : {};
 
-  const where = {
-    ...baseFilter,
-    OR: [
-      { verificationStatus: "VERIFIED" as const },
-      { source: "gnews" },
-    ],
-  };
+  const where = category && category !== "all"
+    ? { category }
+    : {};
 
   const [articles, total] = await Promise.all([
     prisma.article.findMany({
@@ -22,7 +20,6 @@ async function fetchArticlesViaPrisma(category: string | null, page: number, lim
         id: true, slug: true, title: true, content: true, thumbnailUrl: true,
         category: true, verificationScore: true, verificationStatus: true,
         readingTime: true, publishedAt: true,
-        source: true, sourceUrl: true, authorName: true,
         author: { select: { id: true, name: true } },
       },
       orderBy: { publishedAt: "desc" },
@@ -40,15 +37,14 @@ async function fetchArticlesViaApi(category: string | null, limit: number, skip:
     query(`
       SELECT a.id, a.slug, a.title, a.content, a.thumbnail_url, a.category,
              a.verification_score, a.verification_status, a.reading_time, a.published_at,
-             a.source, a.source_url, a.author_name,
              u.id as author_id, u.name as author_name_user
       FROM "articles" a
       LEFT JOIN "users" u ON u.id = a.author_id::uuid
-      WHERE (a.verification_status = 'VERIFIED' OR a.source = 'gnews') ${catFilter}
+      WHERE a.verification_status = 'VERIFIED' ${catFilter}
       ORDER BY a.published_at DESC
       LIMIT ${limit} OFFSET ${skip}
     `),
-    query(`SELECT COUNT(*) as cnt FROM "articles" WHERE (verification_status = 'VERIFIED' OR source = 'gnews') ${catFilter}`),
+    query(`SELECT COUNT(*) as cnt FROM "articles" WHERE verification_status = 'VERIFIED' ${catFilter}`),
   ]);
 
   const articles = rows.map((r: Record<string, unknown>) => ({
@@ -56,9 +52,7 @@ async function fetchArticlesViaApi(category: string | null, limit: number, skip:
     thumbnailUrl: r.thumbnail_url, category: r.category,
     verificationScore: r.verification_score, verificationStatus: r.verification_status,
     readingTime: r.reading_time, publishedAt: r.published_at,
-    source: r.source, sourceUrl: r.source_url,
-    authorName: r.author_name || null,
-    author: r.author_id ? { id: r.author_id, name: r.author_name_user || r.author_name } : null,
+    author: r.author_id ? { id: r.author_id, name: r.author_name_user || "" } : null,
   }));
   const total = Number((countResult[0] as Record<string, unknown>)?.cnt ?? 0);
   return { articles, total };

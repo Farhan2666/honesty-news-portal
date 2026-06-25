@@ -1,5 +1,3 @@
-export type NewsSource = "gnews" | "manual" | "free-news";
-
 export interface NewsArticle {
   title: string;
   description: string;
