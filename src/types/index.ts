@@ -21,7 +21,10 @@ export type Article = {
   verificationStatus: VerificationStatus;
   readingTime: number | null;
   publishedAt: string | null;
-  author: { id: string; name: string };
+  author: { id: string; name: string } | null;
+  source: string | null;
+  sourceUrl: string | null;
+  authorName: string | null;
   isBookmarked?: boolean;
 };
 

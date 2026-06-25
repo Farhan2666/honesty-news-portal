@@ -18,7 +18,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     } catch {
       console.log("Prisma unavailable, falling back to Management API for article detail");
       const rows = await query(`
-        SELECT a.*, u.id as author_id, u.name as author_name
+        SELECT a.*, u.id as author_id, u.name as author_name_user
         FROM "articles" a
         LEFT JOIN "users" u ON u.id = a.author_id::uuid
         WHERE a.slug = '${slug.replace(/'/g, "''")}'
@@ -36,8 +36,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
         verificationScore: r.verification_score,
         verificationStatus: r.verification_status,
         readingTime: r.reading_time, publishedAt: r.published_at,
+        source: r.source, sourceUrl: r.source_url, authorName: r.author_name,
         createdAt: r.created_at, updatedAt: r.updated_at,
-        author: r.author_id ? { id: r.author_id, name: r.author_name } : null,
+        author: r.author_id ? { id: r.author_id, name: r.author_name_user || r.author_name } : null,
       };
 
       const verRows = await query(`

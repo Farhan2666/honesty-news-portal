@@ -1,4 +1,10 @@
 {
   "installCommand": "npm install --install-strategy=nested",
-  "buildCommand": "next build"
+  "buildCommand": "next build",
+  "crons": [
+    {
+      "path": "/api/news/sync-cron",
+      "schedule": "0 */6 * * *"
+    }
+  ]
 }

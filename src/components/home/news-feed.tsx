@@ -11,9 +11,14 @@ export function NewsFeed() {
 
   const categories = [
     { slug: "all", name: "Semua" },
-    { slug: "politik", name: "Politik" },
     { slug: "teknologi", name: "Teknologi" },
-    { slug: "lifestyle", name: "Lifestyle" },
+    { slug: "bisnis", name: "Bisnis" },
+    { slug: "olahraga", name: "Olahraga" },
+    { slug: "sains", name: "Sains" },
+    { slug: "hiburan", name: "Hiburan" },
+    { slug: "dunia", name: "Dunia" },
+    { slug: "kesehatan", name: "Kesehatan" },
+    { slug: "nasional", name: "Nasional" },
   ];
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
-import { HiHome, HiPencil, HiShieldCheck, HiChartBar, HiArrowLeft } from "react-icons/hi";
+import { HiHome, HiPencil, HiShieldCheck, HiChartBar, HiArrowLeft, HiRefresh } from "react-icons/hi";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -24,6 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin", label: "Dashboard", icon: HiChartBar },
     { href: "/admin/create", label: "Buat Artikel", icon: HiPencil },
     { href: "/admin/verify", label: "Verifikasi", icon: HiShieldCheck },
+    { href: "/admin/sync", label: "Sync Berita", icon: HiRefresh },
   ];
 
   return (
