@@ -53,11 +53,22 @@ async function fetchArticlesViaApi(category: string | null, limit: number, skip:
   return { articles, total };
 }
 
+function liveSlug(url: string, i: number): string {
+  let hash = 0;
+  for (let j = 0; j < url.length; j++) {
+    hash = ((hash << 5) - hash) + url.charCodeAt(j);
+    hash |= 0;
+  }
+  return `live-${Math.abs(hash).toString(36)}-${i}`;
+}
+
 async function fetchLiveNewsFallback(category: string | null, limit: number) {
   const rawArticles = await fetchTopNews(category || undefined, Math.min(limit, 20));
-  const articles = rawArticles.map((raw, i) => ({
-    id: `live-${Date.now()}-${i}`,
-    slug: `live-${Date.now()}-${i}`,
+  const articles = rawArticles.map((raw, i) => {
+    const slug = liveSlug(raw.url, i);
+    return {
+    id: slug,
+    slug,
     title: raw.title,
     content: raw.content || raw.description || "",
     thumbnailUrl: raw.image,
